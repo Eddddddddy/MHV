@@ -35,10 +35,10 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);
 #define Servo_2 31
 #define Servo_3 32
 #define Servo_4 33
-//servo1 抓取 0
-//servo2 抓取-举起 90-180
-//servo3 抓取准备 0
-//servo4 开 关 20-60
+//servo 1 抓取 0
+//servo 2 抓取-举起 90-180
+//servo 3 抓取准备 0
+//servo 4 开 关 20-60
 
 #define INI_Servo_1 90
 #define INI_Servo_2 90
@@ -79,53 +79,21 @@ long int iiii;
 
 //double zzz;
 
-void flash()
-{
-    u8g.firstPage();
-    do {
-        u8g.setFont(u8g_font_unifont);
-        //u8g.setFont(u8g_font_osb21);
-        if(ooooo==1)
-        {
-            u8g.drawStr( 0, 22, "123");
-        }
-        if(ooooo==2)
-        {
-            u8g.drawStr( 0, 22, "132");
-        }
-        if(ooooo==3)
-        {
-            u8g.drawStr( 0, 22, "213");
-        }
-        if(ooooo==4)
-        {
-            u8g.drawStr( 0, 22, "231");
-        }
-        if(ooooo==5)
-        {
-            u8g.drawStr( 0, 22, "312");
-        }
-        if(ooooo==1)
-        {
-            u8g.drawStr( 0, 22, "321");
-        }
-    } while( u8g.nextPage() );
-}
 
 void setup()
 {
-    //zzz=Serial.println((float)JY901.stcAngle.Angle[2]/32768*180);
     Serial.begin(9600);
     Serial1.begin(9600);
     Serial2.begin(9600);
     Serial3.begin(9600);
     //softSerial.begin(115200);
+
+    while (Serial.read() >= 0) {}
     while (Serial1.read() >= 0) {}
     while (Serial2.read() >= 0) {}
     while (Serial3.read() >= 0) {}
-    while (Serial.read() >= 0) {}
 
-    MsTimer2::set(1, flash);
+    //MsTimer2::set(1, flash);
 
     pinMode(Motor_PWM_1, OUTPUT); //定义电机针脚
     pinMode(Motor_PWM_2, OUTPUT);
@@ -162,16 +130,6 @@ void setup()
     pinMode(ca9, INPUT);
 
     pinMode(ca10, OUTPUT);
-    //  Wire.begin();//超声波
-    //  delay(100);
-    //  Wire.beginTransmission(ks1031);
-    //  Wire, beginTransmission(ks1032);
-    //  Wire.write(Reg);
-    //  Wire.write(NC);
-    //  Wire.endTransmission(ks1031);
-    //  Wire.endTransmission(ks1032);
-    //
-
 
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
@@ -207,535 +165,8 @@ void setup()
 void loop()
 {
 
-
-    movexyz3(140, 0, 0, 0);
-    delay(1500);
-    stop();
-    movexyz3(0, 100, 0, 0);
-    delay(1000);
-    stop();
-    delay(100);
-    //automove(3, 1);
-    //Serial3.write("1");
-    digitalWrite(ca1, HIGH);
-    delay(1000);
-    digitalWrite(ca1, LOW);
-    movexyz3(-100, 0, 0, 0);
-    delay(700);
-    stop();
-    delay(50);
-    automove(1, 5);
-
-    //Serial.print(c[1]);
-    movexyz3(-80, 0, 0, 0);
-    delay(400);
-    stop();
-    delay(50);
-    movexyz3(0, -80, 0, 0);
-    delay(1300);
-    stop();
-    delay(50);
-    movexyz3(0, 80, 0, 0);
-    delay(1300);
-    stop();
-    delay(50);
-    movexyz3(100, 0, 0, 0);
-    delay(300);
-    stop();
-    delay(50);
-
-    automove(2, 3);
-    stop();
-    delay(500);
-    //int bbbbb = c[2];
-    //int ccccc = c[3];
-    //Serial.print(aaaaa);
-    //Serial.print(bbbbb);
-    //Serial.print(ccccc);
-    numnum();
-    //MsTimer2::start();
-
-    delay(1000);
-    autoput();
-    delay(100000000000000000);
 }
-void numnum()
-{
-    int sss[6], cccc, bbbb;
-    sss[0] = digitalRead(ca4);
-    sss[1] = digitalRead(ca5);
-    sss[2] = digitalRead(ca6);
-    sss[3] = digitalRead(ca7);
-    sss[4] = digitalRead(ca8);
-    sss[5] = digitalRead(ca9);
-    if (sss[0] && !sss[1] && !sss[2]) {
-        cccc = 1;
-    }
-    if (!sss[0] && sss[1] && !sss[2]) {
-        cccc = 2;
-    }
-    if (sss[0] && sss[1] && !sss[2]) {
-        cccc = 3;
-    }
-    if (!sss[0] && !sss[1] && sss[2]) {
-        cccc = 4;
-    }
-    if (sss[0] && !sss[1] && sss[2]) {
-        cccc = 5;
-    }
-    if (!sss[0] && sss[1] && sss[2]) {
-        cccc = 6;
-    }
-    if (sss[3] && !sss[4] && !sss[5]) {
-        bbbb = 1;
-    }
-    if (!sss[3] && sss[4] && !sss[5]) {
-        bbbb = 2;
-    }
-    if (sss[3] && sss[4] && !sss[5]) {
-        bbbb = 3;
-    }
-    if (!sss[3] && !sss[4] && sss[5]) {
-        bbbb = 4;
-    }
-    if (sss[3] && !sss[4] && sss[5]) {
-        bbbb = 5;
-    }
-    if (!sss[3] && sss[4] && sss[5]) {
-        bbbb = 6;
-    }
-    //  int cccc = 6;
-    //  int bbbb = 6;
-    //  if (digitalRead(ca1)){cccc = 1;}
-    //  if (digitalRead(ca2)){cccc = 2;}
-    //  if (digitalRead(ca3)){cccc = 3;}
-    //  if (digitalRead(ca4)){cccc = 4;}
-    //  if (digitalRead(ca5)){cccc = 5;}
-    //  if (digitalRead(ca6)){bbbb = 1;}
-    //  if (digitalRead(ca7)){bbbb = 2;}
-    //  if (digitalRead(ca8)){bbbb = 3;}
-    //  if (digitalRead(ca9)){bbbb = 4;}
-    //  if (digitalRead(ca10)){bbbb = 5;}
-    //char cccc = Serial3.read();
-    //char bbbb = Serial3.read();
-    //int ddd= Serial3.read();
-    //  Serial.print(ccc);
-    //  c[0]=Serial3.parseInt();
-    //  b[0]=Serial3.parseInt();
-    //Serial.println(ccc);
-    //Serial.println(ddd);
-    Serial.println(cccc);
-    Serial.println(bbbb);
-    //c[0]=ccc/10;
-    //b[0]=ccc%10;
-    //c[0] = (((int)Serial3.read())+2)%10;
-    //b[0] = (((int)Serial3.read())+2)%10;
-    //Serial.println(c[0]);
-    //Serial.println(b[0]);
-    if (bbbb == 1)
-    {
-        b[1] = 1;
-        b[2] = 2;
-        b[3] = 3;
-        //draw123();
-        ooooo=1;
-    }
-    if (bbbb == 2)
-    {
-        b[1] = 1;
-        b[2] = 3;
-        b[3] = 2;
-        //draw132();
-        ooooo=2;
-    }
-    if (bbbb == 3)
-    {
-        b[1] = 2;
-        b[2] = 1;
-        b[3] = 3;
-        //draw213();
-        ooooo=3;
-    }
-    if (bbbb == 4)
-    {
-        b[1] = 2;
-        b[2] = 3;
-        b[3] = 1;
-        //draw231();
-        ooooo=4;
-    }
-    if (bbbb == 5)
-    {
-        b[1] = 3;
-        b[2] = 1;
-        b[3] = 2;
-        //draw312();
-        ooooo=5;
-    }
-    if (bbbb == 6)
-    {
-        b[1] = 3;
-        b[2] = 2;
-        b[3] = 1;
-        //draw321();
-        ooooo=6;
-    }
-    if (cccc == 1)
-    {
-        c[1] = 1;
-        c[2] = 2;
-        c[3] = 3;
-    }
-    if (cccc == 2)
-    {
-        c[1] = 1;
-        c[2] = 3;
-        c[3] = 2;
-    }
-    if (cccc == 3)
-    {
-        c[1] = 2;
-        c[2] = 1;
-        c[3] = 3;
-    }
-    if (cccc == 4)
-    {
-        c[1] = 2;
-        c[2] = 3;
-        c[3] = 1;
-    }
-    if (cccc == 5)
-    {
-        c[1] = 3;
-        c[2] = 1;
-        c[3] = 2;
-    }
-    if (cccc == 6)
-    {
-        c[1] = 3;
-        c[2] = 2;
-        c[3] = 1;
-    }
 
-}
-void seecatch(int number)
-{
-    Serial.println(number);
-    if (number == 1)
-    {
-        //Serial3.write("2");
-        digitalWrite(ca2, HIGH);
-        delay(500);
-        digitalWrite(ca2, LOW);
-    }
-    if (number == 2)
-    {
-        digitalWrite(ca3, HIGH);
-        delay(500);
-        digitalWrite(ca3, LOW);
-    }
-    if (number == 3)
-    {
-        digitalWrite(ca10, HIGH);
-        delay(500);
-        digitalWrite(ca10, LOW);
-    }
-    delay(200);
-}
-void seeput(int number)
-{
-    if (digitalRead(modeee) == 1)
-    {
-        if (number == 3)
-        {
-            automove(1, 1);
-            //Serial2.write("1");
-            delay(1000);
-            //    MsTimer2::start();
-            //    delay(3000);
-            //    MsTimer2::stop();
-            stop();
-            movexyz3(0, 100, 0, 0);
-            delay(1500);
-            stop();
-            //Serial2.write("9");
-            //moveee(0,120,120,0);
-
-            delay(500);
-            //stop();
-            putballa();
-            //automove(4, 1);
-            movexyz3(0, -100, 0, 0);
-            delay(1500);
-
-            stop();
-            putballb();
-            movexyz3(-100,0,0,0);
-            delay(500);
-            stop();
-            automove(2, 1);
-        }
-        if (number == 2)
-        {
-            //automove(1, 1);
-            //Serial2.write("1");
-            //delay(1000);
-            //    MsTimer2::start();
-            //    delay(1900);
-            //    MsTimer2::stop();
-            //stop();
-            stop();
-            delay(500);
-            movexyz3(0, 100, 0, 0);
-            delay(1500);
-            //Serial2.write("9");
-            //delay(500);
-            stop();
-            putballa();
-            //automove(4, 1);
-            movexyz3(0, -100, 0, 0);
-            delay(1500);
-            stop();
-            putballb();
-            //automove(2, 1);
-        }
-        if (number == 1)
-        {
-            automove(2, 1);
-            //   Serial2.write("1");
-            //    delay(1000);
-            //    MsTimer2::start();
-            //    delay(1200);
-            //    MsTimer2::stop();
-            //    stop();
-            //    Serial2.write("9");
-            delay(500);
-            movexyz3(0, 100, 0, 0);
-            delay(1500);
-            stop();
-            putballa();
-            movexyz3(0, -100, 0, 0);
-            delay(1500);
-            stop();
-            //automove(4, 1);
-            putballb();
-            movexyz3(100,0,0,0);
-            delay(500);
-            stop();
-            automove(1, 1);
-        }
-    }
-    else if (digitalRead(modeee) == 0)
-    {
-        if (number == 1)
-        {
-            automove(1, 1);
-            //Serial2.write("1");
-            delay(1000);
-            //    MsTimer2::start();
-            //    delay(3000);
-            //    MsTimer2::stop();
-            stop();
-            movexyz3(0, 100, 0, 0);
-            delay(1500);
-            stop();
-            //Serial2.write("9");
-            //moveee(0,120,120,0);
-
-            delay(500);
-            //stop();
-            putballa();
-            //automove(4, 1);
-            movexyz3(0, -100, 0, 0);
-            delay(1500);
-
-            stop();
-            putballb();
-            movexyz3(-100,0,0,0);
-            delay(500);
-            stop();
-            automove(2, 1);
-        }
-        if (number == 2)
-        {
-            //automove(1, 1);
-            //Serial2.write("1");
-            //delay(1000);
-            //    MsTimer2::start();
-            //    delay(1900);
-            //    MsTimer2::stop();
-            //stop();
-            movexyz3(0, 100, 0, 0);
-            delay(1500);
-            //Serial2.write("9");
-            //delay(500);
-            stop();
-            putballa();
-            //automove(4, 1);
-            movexyz3(0, -100, 0, 0);
-            delay(1500);
-            stop();
-            putballb();
-            //automove(2, 1);
-        }
-        if (number == 3)
-        {
-            automove(2, 1);
-            //   Serial2.write("1");
-            //    delay(1000);
-            //    MsTimer2::start();
-            //    delay(1200);
-            //    MsTimer2::stop();
-            //    stop();
-            //    Serial2.write("9");
-            delay(500);
-            movexyz3(0, 100, 0, 0);
-            delay(1500);
-            stop();
-            putballa();
-            movexyz3(0, -100, 0, 0);
-            delay(1500);
-            stop();
-            //automove(4, 1);
-            putballb();
-            movexyz3(100,0,0,0);
-            delay(500);
-            stop();
-            automove(1, 1);
-        }
-    }
-}
-void gohome()
-{
-    movexyz3(-100,0,0,0);
-    delay(300);
-    stop();
-    automove(2, 3);
-    automove(4, 1);
-    movexyz3(-140, 0, 0, 0);
-    delay(700);
-    movexyz3(0, -140, 0, 0);
-    delay(700);
-    stop();
-    delay(100000000000000);
-}
-void autoput_1(int mmm)
-{
-    jj++;
-    seecatch(ii);
-    //Serial1.write("1");
-    delay(1000);
-    Serial.println(mmm);
-    movexyz3(0,-100,0,0);
-    delay(1000);
-    stop();
-    while (1)
-    {
-        if (mmm == 2)
-        {
-
-            movexyz3(-80, 0, 0, 0);
-            delay(500);
-            stop();
-            delay(50);
-            movexyz3(80, 0, 0, 0);
-            delay(500);
-            stop();
-            delay(50);
-        }
-        if (mmm == 3)
-        {
-            movexyz3(100, 0, 0, 0);
-        }
-        if (mmm == 1)
-        {
-            movexyz3(-100, 0, 0, 0);
-        }
-        if (digitalRead(ca4))
-        {
-            if (1)
-            {
-                stop();
-                //Serial1.write("9");
-                delay(100);
-                movexyz3(0, -140, 0, 40);
-                delay(500);
-                stop();
-                catchball();
-                //        movexyz3(0, 100, 0, 40);
-                //        delay(100);
-                //        stop();
-                delay(100);
-                if (mmm == 1)
-                {
-                    movexyz3(-100, 0, 0, 0);
-                    delay(900);
-                    stop();
-                    automove(1, 1);
-                }
-                if (mmm == 3)
-                {
-                    movexyz3(100, 0, 0, 0);
-                    delay(900);
-                    stop();
-                    automove(2, 1);
-                }
-                stop();
-                delay(100);
-                automove(3, 1);
-                seeput(ii);
-                if (jj == 3)
-                {
-                    gohome();
-                }
-                automove(4, 1);
-                ii = b[jj + 1];
-                break;
-            }
-        }
-    }
-}
-void autoput()
-{
-
-    ii = b[1];
-    Serial.println(ii);
-    Serial.println(c[1]);
-    Serial.println(c[2]);
-    Serial.println(c[3]);
-    while (1)
-    {
-        if (ii == c[1])
-        {
-            //u = 1;
-            autoput_1(1);
-        }
-        if (ii == c[2])
-        {
-            //u = 2;
-            autoput_1(2);
-        }
-        if (ii == c[3])
-        {
-            //u = 3;
-            autoput_1(3);
-        }
-        //Serial.println(ii);
-    }
-}
-//int QR()
-//{
-//  Serial3.write("2");
-//  while (1)
-//  {
-//    if (Serial3.available())
-//    {
-//      delay(50);
-//      break;
-//    }
-//  }
-//  return Serial3.read();
-//}
 
 void automove(int order, int line)
 {
@@ -1076,7 +507,7 @@ void movexyz3(int x, int y, int xx, int yy)
         analogWrite(Motor_PWM_4, abs(MotorSpeed_4));
     }
 }
-void moveee(int motorspeed1, int motorspeed2, int motorspeed3, int motorspeed4)
+void move_4_speed(int motorspeed1, int motorspeed2, int motorspeed3, int motorspeed4)
 {
 
 
@@ -1135,6 +566,7 @@ void moveee(int motorspeed1, int motorspeed2, int motorspeed3, int motorspeed4)
         analogWrite(Motor_PWM_4, abs(motorspeed4));
     }
 }
+
 void stop()
 {
 
@@ -1198,42 +630,6 @@ void stop()
     }
 }
 
-void draw123() {
-    // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    //u8g.setFont(u8g_font_osb21);
-    u8g.drawStr( 0, 22, "123");
-}
-void draw132() {
-    // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    //u8g.setFont(u8g_font_osb21);
-    u8g.drawStr( 0, 22, "132");
-}
-void draw213() {
-    // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    //u8g.setFont(u8g_font_osb21);
-    u8g.drawStr( 0, 22, "213");
-}
-void draw231() {
-    // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    //u8g.setFont(u8g_font_osb21);
-    u8g.drawStr( 0, 22, "231");
-}
-void draw312() {
-    // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    //u8g.setFont(u8g_font_osb21);
-    u8g.drawStr( 0, 22, "312");
-}
-void draw321() {
-    // graphic commands to redraw the complete screen should be placed here
-    u8g.setFont(u8g_font_unifont);
-    //u8g.setFont(u8g_font_osb21);
-    u8g.drawStr( 0, 22, "321");
-}
 
 
 

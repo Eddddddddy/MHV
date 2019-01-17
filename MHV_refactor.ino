@@ -114,18 +114,18 @@ void flash()
 
 void setup()
 {
-    //zzz=Serial.println((float)JY901.stcAngle.Angle[2]/32768*180);
     Serial.begin(9600);
     Serial1.begin(9600);
     Serial2.begin(9600);
     Serial3.begin(9600);
     //softSerial.begin(115200);
+
+    while (Serial.read() >= 0) {}
     while (Serial1.read() >= 0) {}
     while (Serial2.read() >= 0) {}
     while (Serial3.read() >= 0) {}
-    while (Serial.read() >= 0) {}
 
-    MsTimer2::set(1, flash);
+    //MsTimer2::set(1, flash);
 
     pinMode(Motor_PWM_1, OUTPUT); //定义电机针脚
     pinMode(Motor_PWM_2, OUTPUT);
@@ -162,16 +162,6 @@ void setup()
     pinMode(ca9, INPUT);
 
     pinMode(ca10, OUTPUT);
-    //  Wire.begin();//超声波
-    //  delay(100);
-    //  Wire.beginTransmission(ks1031);
-    //  Wire, beginTransmission(ks1032);
-    //  Wire.write(Reg);
-    //  Wire.write(NC);
-    //  Wire.endTransmission(ks1031);
-    //  Wire.endTransmission(ks1032);
-    //
-
 
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
