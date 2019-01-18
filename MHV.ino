@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "Wire.h"
 #include "math.h"
-#include "MsTimer2.h"
+//#include "MsTimer2.h"
 //#include<SoftwareSerial.h>
 //#include<JY901.h>//陀螺仪库
 #include "Servo.h"
@@ -61,10 +61,11 @@
 
 #define ca10 43
 
-#define Trac_1
-#define Trac_2
-#define Trac_3
-#define Trac_4
+#define Track_1 37
+#define Track_2 38
+#define Track_3 39
+#define Track_4 40
+//碰到黑线是1
 
 #define modeee 45
 #define tracb 44
@@ -153,16 +154,103 @@ void setup() {
     pinMode(A1, INPUT);
     pinMode(8, OUTPUT);
     digitalWrite(8, HIGH);
-    delay(300);
+
 
 }
 
 //loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop
 void loop() {
-
+Auto_Move(1,2);
 }
 
+void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
+    i = 1;
+    if (order == 1) {
+        while (1) {
+            if (digitalRead(Track_4)) {
+                    i++;
+                    if (i > line) {
+                        break;
+                    }
+                }
+            Move_speed_adjust(140, 0, 60, 0);
+        }
+    } else if (order == 2) {
+        while (1) {
+            if (digitalRead(Track_3)) {
+                    i++;
+                    if (i > line) {
+                        break;
+                    }
+            }
+            Move_speed_adjust(-140, 0, 60, 0);
+        }
+    } else if (order == 3) {
+        while (1) {
+            if (digitalRead(Track_2)) {
+                    i++;
+                    if (i > line) {
+                        break;
+                    }
+            }
+            Move_speed_adjust(0, 140, 0, 30);
+        }
+    } else if (order == 4) {
+        while (1) {
+            if (digitalRead(Track_1)) {
+                    i++;
+                    if (i > line) {
+                        break;
+                    }
+            }
+            Move_speed_adjust(0, -140, 0, 30);
+        }
+    }
+    stop();
+}
+void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
+    int State[8];
+    State[0] = digitalRead(Track_1);//碰到黑线是1
+    State[1] = digitalRead(Track_2);
+    State[2] = digitalRead(Track_3);
+    State[3] = digitalRead(Track_4);
+    State[4] = digitalRead(Cam_3L);
+    State[5] = digitalRead(Cam_3R);
+    State[6] = digitalRead(Cam_4L);
+    State[7] = digitalRead(Cam_4R);
 
+    if (x_speed != 0) {
+        MotorSpeed_1 = x_speed;
+        MotorSpeed_4 = -x_speed;
+        MotorSpeed_2 = 0;
+        MotorSpeed_3 = 0;
+        if (State[0]&&!State[1]) {
+            MotorSpeed_4 = -(x_speed + x_adjust);
+            MotorSpeed_1 = x_speed - x_adjust;
+        }
+        if (!State[0]&&State[1]) {
+            MotorSpeed_1 = x_speed + x_adjust;
+            MotorSpeed_4 = -(x_speed - x_adjust);
+        }
+    } else if (y_speed != 0) {
+        MotorSpeed_2 = -y_speed;
+        MotorSpeed_3 = y_speed;
+        MotorSpeed_1 = 0;
+        MotorSpeed_4 = 0;
+        if (State[2]&&!State[3]) {
+            MotorSpeed_2 = -(y_speed + y_adjust);
+            MotorSpeed_3 = y_speed - y_adjust;
+        }
+        if (!State[2]&&State[3]) {
+            MotorSpeed_2 = -(y_speed - y_adjust);
+            MotorSpeed_3 = y_speed + y_adjust;
+        }
+    }
+
+
+    Move_4_speed(MotorSpeed_1, MotorSpeed_2, MotorSpeed_3, MotorSpeed_4);
+
+}
 void Move_4_speed(int Speed_1, int Speed_2, int Speed_3, int Speed_4) {
 
     if (Speed_1 > 0)//判断正反转
@@ -208,164 +296,6 @@ void Move_4_speed(int Speed_1, int Speed_2, int Speed_3, int Speed_4) {
         analogWrite(Motor_PWM_4, abs(Speed_4));
     }
 }
-
-
-void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
-    int State[8];
-    State[0] = digitalRead(Trac_1);//碰到黑线是1
-    State[1] = digitalRead(Trac_2);
-    State[2] = digitalRead(Trac_3);
-    State[3] = digitalRead(Trac_4);
-    State[4] = digitalRead(Cam_3L);
-    State[5] = digitalRead(Cam_3R);
-    State[6] = digitalRead(Cam_4L);
-    State[7] = digitalRead(Cam_4R);
-
-    if (x_speed > 0) {
-        MotorSpeed_1 = x_speed;
-        MotorSpeed_4 = -x_speed;
-        MotorSpeed_2 = 0;
-        MotorSpeed_3 = 0;
-        if (State[0]&&!State[1]) {
-            MotorSpeed_4 = -(x_speed + x_adjust);
-            MotorSpeed_1 = x_speed - x_adjust;
-        }
-        if (!State[0]&&State[1]) {
-            MotorSpeed_1 = x_speed + x_adjust;
-            MotorSpeed_4 = -(x_speed - x_adjust);
-        }
-    }
-    if (x_speed < 0) {
-        MotorSpeed_1 = x_speed;
-        MotorSpeed_4 = -x_speed;
-        MotorSpeed_2 = 0;
-        MotorSpeed_3 = 0;
-        if (State[0]) {
-            MotorSpeed_4 = -(x_speed + x_adjust);
-            MotorSpeed_1 = x_speed - x_adjust;
-        }
-        if (State[1]) {
-            MotorSpeed_1 = x_speed + x_adjust;
-            MotorSpeed_4 = -(x_speed - x_adjust);
-        }
-    } else if (y_speed != 0) {
-        MotorSpeed_2 = -y_speed;
-        MotorSpeed_3 = y_speed;
-        MotorSpeed_1 = 0;
-        MotorSpeed_4 = 0;
-
-
-        if (State[4]) {
-            MotorSpeed_1 = -40;
-            MotorSpeed_4 = 40;
-        }
-        if (State[5]) {
-            MotorSpeed_1 = 40;
-            MotorSpeed_4 = -40;
-        }
-        if (State[6]) {
-            MotorSpeed_2 = -(y_speed + y_adjust);
-            MotorSpeed_3 = y_speed - y_adjust;
-        }
-        if (State[7]) {
-            MotorSpeed_2 = -(y_speed - y_adjust);
-            MotorSpeed_3 = y_speed + y_adjust;
-        }
-    }
-
-
-    Move_4_speed(MotorSpeed_1, MotorSpeed_2, MotorSpeed_3, MotorSpeed_4);
-
-}
-
-
-void Auto_Move(int order, int line) {
-    digitalWrite(8, LOW);
-    i = 1;
-    if (order == 1) {
-        Serial1.write("1");
-        Serial2.write("2");
-        //i = 0;
-        delay(2000);
-
-        while (1) {
-            if (Serial2.available()) {
-                if (Serial2.read() == '0') {
-
-                    i++;
-                    if (i > line) {
-                        break;
-                    }
-                    Serial2.write("2");
-                }
-            }
-            Move_speed_adjust(140, 0, 60, 0);
-        }
-        stop();
-        Serial1.write("9");
-    } else if (order == 2) {
-        Serial1.write("1");
-        Serial2.write("3");
-        delay(2000);
-        //i = 0;
-        while (1) {
-            if (Serial2.available()) {
-                if (Serial2.read() == '0') {
-
-                    i++;
-                    if (i > line) {
-                        break;
-                    }
-                    Serial2.write("3");
-                }
-            }
-            Move_speed_adjust(-140, 0, 60, 0);
-        }
-        stop();
-        Serial1.write("9");
-    } else if (order == 3) {
-        Serial1.write("2");
-        Serial2.write("1");
-        delay(2000);
-        // i = 0;
-        while (1) {
-            if (Serial1.available()) {
-                if (Serial1.read() == '0') {
-
-                    i++;
-                    if (i > line) {
-                        break;
-                    }
-                    Serial1.write("2");
-                }
-            }
-            Move_speed_adjust(0, 140, 0, 30);
-        }
-        stop();
-        Serial2.write("9");
-    } else if (order == 4) {
-        Serial1.write("3");
-        Serial2.write("1");
-        delay(2000);
-        // i = 0;
-        while (1) {
-            if (Serial1.available()) {
-                if (Serial1.read() == '0') {
-                    i++;
-                    if (i > line) {
-                        break;
-                    }
-
-                    Serial1.write("3");
-                }
-            }
-            Move_speed_adjust(0, -140, 0, 30);
-        }
-        stop();
-        Serial2.write("9");
-    }
-}
-
 void stop() {
 
     MotorSpeed_1 = 0;
