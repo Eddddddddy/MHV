@@ -34,10 +34,10 @@
 #define Cam_4L 48
 #define Cam_4R 49
 
-#define Servo_1 30
-#define Servo_2 31
-#define Servo_3 32
-#define Servo_4 33
+#define Servo_1 6
+#define Servo_2 7
+#define Servo_3 8
+#define Servo_4 9
 //servo 1 抓取 0
 //servo 2 抓取-举起 90-180
 //servo 3 抓取准备 0
@@ -89,6 +89,8 @@ long int iiii;
 
 //double zzz;
 
+
+void goto_put();
 
 void setup() {
     Serial.begin(9600);
@@ -146,7 +148,6 @@ void setup() {
     pinMode(Track_4, INPUT);
 
 
-
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
     Hand_Servo_3.attach(Servo_3);
@@ -155,12 +156,6 @@ void setup() {
     Hand_Servo_2.write(INI_Servo_2);
     Hand_Servo_3.write(INI_Servo_3);
     Hand_Servo_4.write(INI_Servo_4);
-
-
-    pinMode(A0, INPUT);
-    pinMode(A1, INPUT);
-    pinMode(8, OUTPUT);
-    digitalWrite(8, HIGH);
 
 
 }
@@ -216,7 +211,7 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
                 }
                 i++;
             }
-            if (i > line*2) {
+            if (i > line) {
                 break;
             }
             Move_speed_adjust(0, 140, 0, 90);
@@ -232,7 +227,7 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
                 }
                 i++;
             }
-            if (i > line*2) {
+            if (i > line) {
                 break;
             }
             Move_speed_adjust(0, -140, 0, 90);
@@ -271,15 +266,15 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
         MotorSpeed_1 = 0;
         MotorSpeed_4 = 0;
         if (State[2] && !State[3]) {
-//            MotorSpeed_2 = -(y_speed + y_adjust);
-//            MotorSpeed_3 = y_speed - y_adjust;
-MotorSpeed_4=-y_adjust;
+            MotorSpeed_2 = -(y_speed + y_adjust);
+            MotorSpeed_3 = y_speed - y_adjust;
+            MotorSpeed_4 = -y_adjust;
 
         }
         if (!State[2] && State[3]) {
-//            MotorSpeed_2 = -(y_speed - y_adjust);
-//            MotorSpeed_3 = y_speed + y_adjust;
-MotorSpeed_4=y_adjust;
+            MotorSpeed_2 = -(y_speed - y_adjust);
+            MotorSpeed_3 = y_speed + y_adjust;
+            MotorSpeed_4 = y_adjust;
         }
     }
 
@@ -384,4 +379,56 @@ void stop() {
         digitalWrite(Motor_B4, LOW);
         analogWrite(Motor_PWM_4, abs(MotorSpeed_4));
     }
+}
+
+void c1_p1() {
+    Auto_Move(2, 1);
+    goto_put();
+}
+
+void c1_p2() {
+    Auto_Move(1, 1);
+    goto_put();
+}
+
+void c1_p3() {
+    Auto_Move(1, 2);
+    goto_put();
+}
+
+void c2_p1() {
+    Auto_Move(2, 1);
+    goto_put();
+}
+
+void c2_p2() {
+    goto_put();
+}
+
+void c2_p3() {
+    Auto_Move(1, 1);
+    goto_put();
+}
+
+void c3_p1() {
+    Auto_Move(2, 2);
+    goto_put();
+}
+
+void c3_p2() {
+    Auto_Move(2, 1);
+    goto_put();
+}
+
+void c3_p3() {
+    Auto_Move(1, 1);
+    goto_put();
+}
+
+void goto_put() {
+    Auto_Move(3, 3);
+    Move_speed_adjust(0, 140, 0, 0);
+    delay(300);
+    stop();
+    Put_Ball_a();
 }
