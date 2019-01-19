@@ -48,11 +48,11 @@
 #define INI_Servo_3 0
 #define INI_Servo_4 20
 
-#define ca1 34
-#define ca2 35
-#define ca3 36
-
-#define ca4 37
+//#define ca1 34
+//#define ca2 35
+//#define ca3 36
+//
+//#define ca4 37
 #define ca5 38
 #define ca6 39
 #define ca7 40
@@ -61,10 +61,10 @@
 
 #define ca10 43
 
-#define Track_1 37
-#define Track_2 38
-#define Track_3 39
-#define Track_4 40
+#define Track_1 34
+#define Track_2 35
+#define Track_3 36
+#define Track_4 37
 //碰到黑线是1
 
 #define modeee 45
@@ -117,28 +117,35 @@ void setup() {
     pinMode(Motor_A4, OUTPUT);
     pinMode(Motor_B4, OUTPUT);
 
-    pinMode(Cam_1L, INPUT);
-    pinMode(Cam_1R, INPUT);
-    pinMode(Cam_2L, INPUT);
-    pinMode(Cam_2R, INPUT);
-    pinMode(Cam_3L, INPUT);
-    pinMode(Cam_3R, INPUT);
-    pinMode(Cam_4L, INPUT);
-    pinMode(Cam_4R, INPUT);
-    //movexyz(0, 0, 0);
+//    pinMode(Cam_1L, INPUT);
+//    pinMode(Cam_1R, INPUT);
+//    pinMode(Cam_2L, INPUT);
+//    pinMode(Cam_2R, INPUT);
+//    pinMode(Cam_3L, INPUT);
+//    pinMode(Cam_3R, INPUT);
+//    pinMode(Cam_4L, INPUT);
+//    pinMode(Cam_4R, INPUT);
+//    //movexyz(0, 0, 0);
+//
+//    pinMode(ca1, OUTPUT);
+//    pinMode(ca2, OUTPUT);
+//    pinMode(ca3, OUTPUT);
+//
+//    pinMode(ca4, INPUT);
+//    pinMode(ca5, INPUT);
+//    pinMode(ca6, INPUT);
+//    pinMode(ca7, INPUT);
+//    pinMode(ca8, INPUT);
+//    pinMode(ca9, INPUT);
 
-    pinMode(ca1, OUTPUT);
-    pinMode(ca2, OUTPUT);
-    pinMode(ca3, OUTPUT);
+    //pinMode(ca10, OUTPUT);
 
-    pinMode(ca4, INPUT);
-    pinMode(ca5, INPUT);
-    pinMode(ca6, INPUT);
-    pinMode(ca7, INPUT);
-    pinMode(ca8, INPUT);
-    pinMode(ca9, INPUT);
+    pinMode(Track_1, INPUT);
+    pinMode(Track_2, INPUT);
+    pinMode(Track_3, INPUT);
+    pinMode(Track_4, INPUT);
 
-    pinMode(ca10, OUTPUT);
+
 
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
@@ -160,54 +167,80 @@ void setup() {
 
 //loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop
 void loop() {
-Auto_Move(1,2);
+    Auto_Move(3, 40);
+    delay(10000000);
 }
 
 void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
     i = 1;
     if (order == 1) {
         while (1) {
-            if (digitalRead(Track_4)) {
-                    i++;
-                    if (i > line) {
+            if (digitalRead(Track_3)) {
+                delay(50);
+                while (1) {
+                    if (digitalRead(Track_3) == 0) {
                         break;
                     }
                 }
-            Move_speed_adjust(140, 0, 60, 0);
+                i++;
+            }
+            if (i > line) {
+                break;
+            }
+            Move_speed_adjust(140, 0, 80, 0);
         }
     } else if (order == 2) {
         while (1) {
-            if (digitalRead(Track_3)) {
-                    i++;
-                    if (i > line) {
+            if (digitalRead(Track_4)) {
+                delay(50);
+                while (1) {
+                    if (digitalRead(Track_4) == 0) {
                         break;
                     }
+                }
+                i++;
             }
-            Move_speed_adjust(-140, 0, 60, 0);
+            if (i > line) {
+                break;
+            }
+            Move_speed_adjust(-140, 0, 80, 0);
         }
     } else if (order == 3) {
         while (1) {
-            if (digitalRead(Track_2)) {
-                    i++;
-                    if (i > line) {
+            if (digitalRead(Track_1)) {
+                delay(50);
+                while (1) {
+                    if (digitalRead(Track_1) == 0) {
                         break;
                     }
+                }
+                i++;
             }
-            Move_speed_adjust(0, 140, 0, 30);
+            if (i > line*2) {
+                break;
+            }
+            Move_speed_adjust(0, 140, 0, 90);
         }
     } else if (order == 4) {
         while (1) {
-            if (digitalRead(Track_1)) {
-                    i++;
-                    if (i > line) {
+            if (digitalRead(Track_2)) {
+                delay(50);
+                while (1) {
+                    if (digitalRead(Track_2) == 0) {
                         break;
                     }
+                }
+                i++;
             }
-            Move_speed_adjust(0, -140, 0, 30);
+            if (i > line*2) {
+                break;
+            }
+            Move_speed_adjust(0, -140, 0, 90);
         }
     }
     stop();
 }
+
 void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
     int State[8];
     State[0] = digitalRead(Track_1);//碰到黑线是1
@@ -224,26 +257,29 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
         MotorSpeed_4 = -x_speed;
         MotorSpeed_2 = 0;
         MotorSpeed_3 = 0;
-        if (State[0]&&!State[1]) {
+        if (State[0] && !State[1]) {
+            MotorSpeed_4 = -(x_speed - x_adjust);
+            MotorSpeed_1 = x_speed + x_adjust;
+        }
+        if (!State[0] && State[1]) {
             MotorSpeed_4 = -(x_speed + x_adjust);
             MotorSpeed_1 = x_speed - x_adjust;
-        }
-        if (!State[0]&&State[1]) {
-            MotorSpeed_1 = x_speed + x_adjust;
-            MotorSpeed_4 = -(x_speed - x_adjust);
         }
     } else if (y_speed != 0) {
         MotorSpeed_2 = -y_speed;
         MotorSpeed_3 = y_speed;
         MotorSpeed_1 = 0;
         MotorSpeed_4 = 0;
-        if (State[2]&&!State[3]) {
-            MotorSpeed_2 = -(y_speed + y_adjust);
-            MotorSpeed_3 = y_speed - y_adjust;
+        if (State[2] && !State[3]) {
+//            MotorSpeed_2 = -(y_speed + y_adjust);
+//            MotorSpeed_3 = y_speed - y_adjust;
+MotorSpeed_4=-y_adjust;
+
         }
-        if (!State[2]&&State[3]) {
-            MotorSpeed_2 = -(y_speed - y_adjust);
-            MotorSpeed_3 = y_speed + y_adjust;
+        if (!State[2] && State[3]) {
+//            MotorSpeed_2 = -(y_speed - y_adjust);
+//            MotorSpeed_3 = y_speed + y_adjust;
+MotorSpeed_4=y_adjust;
         }
     }
 
@@ -251,6 +287,7 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
     Move_4_speed(MotorSpeed_1, MotorSpeed_2, MotorSpeed_3, MotorSpeed_4);
 
 }
+
 void Move_4_speed(int Speed_1, int Speed_2, int Speed_3, int Speed_4) {
 
     if (Speed_1 > 0)//判断正反转
@@ -296,6 +333,7 @@ void Move_4_speed(int Speed_1, int Speed_2, int Speed_3, int Speed_4) {
         analogWrite(Motor_PWM_4, abs(Speed_4));
     }
 }
+
 void stop() {
 
     MotorSpeed_1 = 0;
