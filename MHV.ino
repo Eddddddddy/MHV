@@ -5,6 +5,7 @@
 //#include<SoftwareSerial.h>
 //#include<JY901.h>//陀螺仪库
 #include "Servo.h"
+#include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/USBAPI.h"
 //舵机库
 //#include "U8glib.h"
 //U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);
@@ -61,10 +62,12 @@
 
 #define ca10 43
 
-#define Track_1 34
-#define Track_2 35
-#define Track_3 36
-#define Track_4 37
+#define Track_1 30
+#define Track_2 31
+#define Track_3 32
+#define Track_4 33
+#define Track_5 34
+#define Track_6 35
 //碰到黑线是1
 
 #define modeee 45
@@ -91,6 +94,8 @@ long int iiii;
 
 
 void goto_put();
+
+void Move_nonTrack(int dir, int time);
 
 void setup() {
     Serial.begin(9600);
@@ -162,7 +167,7 @@ void setup() {
 
 //loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop
 void loop() {
-    Auto_Move(3, 40);
+    Auto_Move(4, 40);
     delay(10000000);
 }
 
@@ -214,7 +219,7 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
             if (i > line) {
                 break;
             }
-            Move_speed_adjust(0, 140, 0, 90);
+            Move_speed_adjust(0, 140, 0, 60);
         }
     } else if (order == 4) {
         while (1) {
@@ -230,7 +235,7 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
             if (i > line) {
                 break;
             }
-            Move_speed_adjust(0, -140, 0, 90);
+            Move_speed_adjust(0, -140, 0, 60);
         }
     }
     stop();
@@ -266,15 +271,15 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
         MotorSpeed_1 = 0;
         MotorSpeed_4 = 0;
         if (State[2] && !State[3]) {
-            MotorSpeed_2 = -(y_speed + y_adjust);
-            MotorSpeed_3 = y_speed - y_adjust;
-            MotorSpeed_4 = -y_adjust;
+            MotorSpeed_2 = -(y_speed - y_adjust);
+            MotorSpeed_3 = y_speed + y_adjust;
+            //MotorSpeed_4 = -y_adjust;
 
         }
         if (!State[2] && State[3]) {
-            MotorSpeed_2 = -(y_speed - y_adjust);
-            MotorSpeed_3 = y_speed + y_adjust;
-            MotorSpeed_4 = y_adjust;
+            MotorSpeed_2 = -(y_speed + y_adjust);
+            MotorSpeed_3 = y_speed - y_adjust;
+            //MotorSpeed_4 = y_adjust;
         }
     }
 
@@ -383,52 +388,124 @@ void stop() {
 
 void c1_p1() {
     Auto_Move(2, 1);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c1_p2() {
     Auto_Move(1, 1);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c1_p3() {
     Auto_Move(1, 2);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c2_p1() {
     Auto_Move(2, 1);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c2_p2() {
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c2_p3() {
     Auto_Move(1, 1);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c3_p1() {
     Auto_Move(2, 2);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c3_p2() {
     Auto_Move(2, 1);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
 void c3_p3() {
     Auto_Move(1, 1);
-    goto_put();
+    Auto_Move(3, 3);
 }
 
-void goto_put() {
-    Auto_Move(3, 3);
-    Move_speed_adjust(0, 140, 0, 0);
-    delay(300);
-    stop();
+void Auto_put() {
+    Move_nonTrack(3, 300);
     Put_Ball_a();
+}
+
+void Auto_Catch(int dir, int color) {//dir为l为左，r为右
+    if (color == 1) {//红
+        digitalWrite(Cam_1_Write_1, LOW);//cam_1_write_1 40
+        digitalWrite(Cam_1_Write_2, HIGH);//41
+    } else if (color == 2) {//绿
+        digitalWrite(Cam_1_Write_1, HIGH);
+        digitalWrite(Cam_1_Write_2, LOW);
+    } else if (color == 3) {//蓝
+        digitalWrite(Cam_1_Write_1, HIGH);
+        digitalWrite(Cam_1_Write_2, HIGH);
+    }
+    while (1) {
+        if (dir == 2) {
+            Move_speed_adjust(-140, 0, 80, 0);
+        } else if (dir == 1) {
+            Move_speed_adjust(140, 0, 80, 0);
+        }
+        if (digitalRead(Cam_1_Read_1)) {//Cam_1_Read_1 42
+            break;
+        }
+    }
+    stop();
+    Move_nonTrack(4, 1000);
+    Catch_Ball();
+}
+
+void Move_nonTrack(int dir, int time) {
+    if (dir == 1) {
+        Move_speed_adjust(140, 0, 0, 0);
+    } else if (dir == 2) {
+        Move_speed_adjust(-140, 0, 0, 0);
+    } else if (dir == 3) {
+        Move_speed_adjust(0, 140, 0, 0);
+    } else if (dir == 4) {
+        Move_speed_adjust(0, -140, 0, 0);
+    }
+    delay(time);
+    stop();
+}
+
+void Catch_Ball() {
+    int i;
+    Hand_Servo_1.write(90);
+    Hand_Servo_4.write(20);//打开角度
+    Hand_Servo_3.write(0);//收手爪
+    Hand_Servo_2.write(120);//抬起角度
+    Hand_Servo_1.write(0);//抓取位置
+    delay(2000);
+    Hand_Servo_2.write(90);//抬起后放回
+    Hand_Servo_3.write(90);//放下手爪
+    delay(1000);
+    Hand_Servo_4.write(60);//抓
+    delay(2000);
+    Hand_Servo_3.write(0);//收手爪
+    Hand_Servo_2.write(120);//抬起
+    delay(1000);
+    Hand_Servo_1.write(90);//到预设位置
+    delay(2000);
+}
+
+int Cam_2_decode(){
+    int a[2];
+    a[0]=digitalRead(Cam_2_Read_1);
+    a[1]=digitalRead(Cam_2_Read_2);
+    if(!a[0]&&a[1]){
+        return 1;
+    }else if(a[0]&&!a[1]){
+        return 2;
+    }else if(a[0]&&a[1]){
+        return 3;
+    }else{
+        return 0;
+    }
 }
