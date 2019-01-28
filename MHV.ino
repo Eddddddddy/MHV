@@ -510,190 +510,285 @@ int Cam_2_decode(){
     }
 }
 
-void process(){
-    int c[4],q[4],p[4];
-    Auto_Catch(2,q[1]);
-    if(q[1]==c[1]){
+void process() {
+    int c[4], q[4], p[4];
+    Auto_Catch(2, q[1]);
+    if (q[1] == c[1]) {
         c1_p1();
-        p[1]=Cam_2_decode();
-        if(p[1]==q[1]){
+        p[1] = Cam_2_decode();
+        if (p[1] == q[1]) {
             Auto_put();
-            p[1]=0;
+            p[1] = 0;
         }
-        Auto_Move(1,1);
-        p[2]=Cam_2_decode();
-        p[3]=6-p[1]-p[2];
-        if(q[1]==p[2]){
+        Auto_Move(1, 1);
+        p[2] = Cam_2_decode();
+        p[3] = 6 - p[1] - p[2];
+        if (q[1] == p[2]) {
             Auto_put();
-            p[2]=0;
-            Auto_Move(4,4);
-        }else if(q[1]==p[3]){
-            Auto_Move(1,1);
+            p[2] = 0;
+            Auto_Move(4, 4);
+        } else if (q[1] == p[3]) {
+            Auto_Move(1, 1);
             Auto_put();
-            p[3]=0;
-            if(q[2]==c[2]){
-                Auto_Move(4,2);
-                Auto_Move(2,1);
-                Auto_Move(4,2);
-            }else if(q[2]==c[3]){
-                Auto_Move(4,4);
+            p[3] = 0;
+            if (q[2] == c[2]) {
+                Auto_Move(4, 2);
+                Auto_Move(2, 1);
+                Auto_Move(4, 2);
+            } else if (q[2] == c[3]) {
+                Auto_Move(4, 4);
             }
         }
-        if(q[2]==c[2]){
+        if (q[2] == c[2]) {
             Catch_Ball();
-            if(q[2]==p[1]){
+            if (q[2] == p[1]) {
                 c2_p1();
-            }else if(q[2]==p[2]){
+            } else if (q[2] == p[2]) {
                 c2_p2();
-            }else if(q[2]==p[3]){
+            } else if (q[2] == p[3]) {
                 c2_p3();
             }
             Auto_put();
-            Auto_Move(4,4);
-            if(q[2]==p[3]){
-                Auto_Catch(2,q[3]);
-            }else{
-                Auto_Catch(1,q[3]);
+            Auto_Move(4, 4);
+            if (q[2] == p[3]) {
+                Auto_Catch(2, q[3]);
+            } else {
+                Auto_Catch(1, q[3]);
             }
-            if(q[3]==p[1]){
+            if (q[3] == p[1]) {
                 c3_p1();
-            }else if(q[3]==p[2]){
+            } else if (q[3] == p[2]) {
                 c3_p2();
-            }else if(q[3]==p[3]){
+            } else if (q[3] == p[3]) {
                 c3_p3();
             }
             Auto_put();
-            Auto_Move(4,2);
-            if(q[3]==p[1]){
-                ;
-            }else if(q[3]==p[2]){
-                Auto_Move(2,1);
-            }else if(q[3]==p[3]){
-                Auto_Move(2,2);
+            Auto_Move(4, 2);
+            if (q[3] == p[1]) { ;
+            } else if (q[3] == p[2]) {
+                Auto_Move(2, 1);
+            } else if (q[3] == p[3]) {
+                Auto_Move(2, 2);
             }
             GoHome();
-        }else if(q[2]==c[3]){
-            if(p[2]==0){
-                Auto_Catch(1,q[2]);
-            }else if(p[3]==0){
-                Auto_Catch(2,q[2]);
+        } else if (q[2] == c[3]) {
+            if (p[3] == 0) {
+                Auto_Catch(2, q[2]);
+            } else {
+                Auto_Catch(1, q[2]);
             }
-            if(q[2]==p[1]){
+            if (q[2] == p[1]) {
                 c3_p1();
                 Auto_put();
-                Auto_Move(4,2);
-                Auto_Move(1,1);
-            }else if(q[2]==p[2]){
+                Auto_Move(4, 2);
+                Auto_Move(1, 1);
+            } else if (q[2] == p[2]) {
                 c3_p2();
                 Auto_put();
-                Auto_Move(4,2);
-            }else if(q[2]==p[3]){
+                Auto_Move(4, 2);
+            } else if (q[2] == p[3]) {
                 c3_p3();
                 Auto_put();
-                Auto_Move(4,2);
-                Auto_Move(2,1);
+                Auto_Move(4, 2);
+                Auto_Move(2, 1);
             }
-            Auto_Move(4,2);
+            Auto_Move(4, 2);
             Catch_Ball();
-            if(q[3]==p[1]){
+            if (q[3] == p[1]) {
                 c2_p1();
-            }else if(q[3]==p[2]){
+            } else if (q[3] == p[2]) {
                 c2_p2();
-            }else if(q[3]==p[3]){
+            } else if (q[3] == p[3]) {
                 c2_p3();
             }
             Auto_put();
-            Auto_Move(4,2);
-            if(q[3]==p[1]){
-                ;
-            }else if(q[3]==p[2]){
-                Auto_Move(2,1);
-            }else if(q[3]==p[3]){
-                Auto_Move(2,2);
+            Auto_Move(4, 2);
+            if (q[3] == p[1]) { ;
+            } else if (q[3] == p[2]) {
+                Auto_Move(2, 1);
+            } else if (q[3] == p[3]) {
+                Auto_Move(2, 2);
             }
             GoHome();
         }
-    }else if(q[1]==c[2]){
+    } else if (q[1] == c[2]) {
         c2_p1();
-        p[1]=Cam_2_decode();
-        if(p[1]==q[1]){
+        p[1] = Cam_2_decode();
+        if (p[1] == q[1]) {
             Auto_put();
-            p[1]=0;
+            p[1] = 0;
         }
-        Auto_Move(1,1);
-        p[2]=Cam_2_decode();
-        p[3]=6-p[1]-p[2];
-        if(q[1]==p[2]){
+        Auto_Move(1, 1);
+        p[2] = Cam_2_decode();
+        p[3] = 6 - p[1] - p[2];
+        if (q[1] == p[2]) {
             Auto_put();
-        }else if(q[1]==p[3]){
-            Auto_Move(1,1);
+        } else if (q[1] == p[3]) {
+            Auto_Move(1, 1);
             Auto_put();
         }
-        Auto_Move(4,4);
-        Auto_Catch(2,q[2]);
-        if(q[2]==c[1]){
-            if(q[2]==p[1]){
+        Auto_Move(4, 4);
+        Auto_Catch(2, q[2]);
+        if (q[2] == c[1]) {
+            if (q[2] == p[1]) {
                 c1_p1();
-            }else if(q[2]==p[2]){
+            } else if (q[2] == p[2]) {
                 c1_p2();
-            }else if(q[2]==p[3]){
+            } else if (q[2] == p[3]) {
                 c1_p3();
             }
             Auto_put();
-            Auto_Move(4,4);
-            if(q[2]==p[3]){
-                Auto_Catch(2,q[3]);
-            }else{
-                Auto_Catch(1,q[3]);
+            Auto_Move(4, 4);
+            if (q[2] == p[3]) {
+                Auto_Catch(2, q[3]);
+            } else {
+                Auto_Catch(1, q[3]);
             }
-            if(q[3]==p[1]){
+            if (q[3] == p[1]) {
                 c3_p1();
-            }else if(q[3]==p[2]){
+            } else if (q[3] == p[2]) {
                 c3_p2();
-            }else if(q[3]==p[3]){
+            } else if (q[3] == p[3]) {
                 c3_p3();
             }
             Auto_put();
-            Auto_Move(4,2);
-            if(q[3]==p[1]){
-                ;
-            }else if(q[3]==p[2]){
-                Auto_Move(2,1);
-            }else if(q[3]==p[3]){
-                Auto_Move(2,2);
+            Auto_Move(4, 2);
+            if (q[3] == p[1]) { ;
+            } else if (q[3] == p[2]) {
+                Auto_Move(2, 1);
+            } else if (q[3] == p[3]) {
+                Auto_Move(2, 2);
             }
             GoHome();
-        }else if(q[2]==c[3]){
-            if(q[2]==p[1]){
+        } else if (q[2] == c[3]) {
+            if (q[2] == p[1]) {
                 c3_p1();
-            }else if(q[2]==p[2]){
+            } else if (q[2] == p[2]) {
                 c3_p2();
-            }else if(q[2]==p[3]){
+            } else if (q[2] == p[3]) {
                 c3_p3();
             }
             Auto_put();
-            Auto_Move(4,4);
-            if(q[2]==p[1]){
-                Auto_Catch(1,q[3]);
-            }else{
-                Auto_Catch(2,q[3]);
+            Auto_Move(4, 4);
+            if (q[2] == p[1]) {
+                Auto_Catch(1, q[3]);
+            } else {
+                Auto_Catch(2, q[3]);
             }
-            if(q[3]==p[1]){
+            if (q[3] == p[1]) {
                 c1_p1();
-            }else if(q[3]==p[2]){
+            } else if (q[3] == p[2]) {
                 c1_p2();
-            }else if(q[3]==p[3]){
+            } else if (q[3] == p[3]) {
                 c1_p3();
             }
             Auto_put();
-            Auto_Move(4,2);
-            if(q[3]==p[1]){
-                ;
-            }else if(q[3]==p[2]){
-                Auto_Move(2,1);
-            }else if(q[3]==p[3]){
-                Auto_Move(2,2);
+            Auto_Move(4, 2);
+            if (q[3] == p[1]) { ;
+            } else if (q[3] == p[2]) {
+                Auto_Move(2, 1);
+            } else if (q[3] == p[3]) {
+                Auto_Move(2, 2);
             }
             GoHome();
+        }
+    } else if (q[1] == c[3]) {
+        c3_p1();
+        p[3] = Cam_2_decode();
+        if (q[1] == p[3]) {
+            Auto_put();
+            p[3] = 0;
+        }
+        Auto_Move(2, 1);
+        p[2] = Cam_2_decode();
+        p[1] = 6 - p[1] - p[2];
+        if (q[1] == p[2]) {
+            Auto_put();
+            p[2] = 0;
+            Auto_Move(4, 4);
+        } else if (q[1] == p[1]) {
+            Auto_Move(2, 1);
+            Auto_put();
+            p[1] = 0;
+            if (q[2] == c[2]) {
+                Auto_Move(4, 2);
+                Auto_Move(1, 1);
+                Auto_Move(4, 2);
+            } else if (q[2] == c[3]) {
+                Auto_Move(4, 4);
+            }
+        }
+        if (q[2] == c[2]) {
+            Catch_Ball();
+            if (q[2] == p[1]) {
+                c2_p1();
+            } else if (q[2] == p[2]) {
+                c2_p2();
+            } else if (q[2] == p[3]) {
+                c2_p3();
+            }
+            Auto_put();
+            Auto_Move(4, 4);
+            if (q[2] == p[3]) {
+                Auto_Catch(2, q[3]);
+            } else {
+                Auto_Catch(1, q[3]);
+            }
+            if (q[3] == p[1]) {
+                c1_p1();
+            } else if (q[3] == p[2]) {
+                c1_p2();
+            } else if (q[3] == p[3]) {
+                c1_p3();
+            }
+            Auto_put();
+            Auto_Move(4, 2);
+            if (q[3] == p[1]) { ;
+            } else if (q[3] == p[2]) {
+                Auto_Move(2, 1);
+            } else if (q[3] == p[3]) {
+                Auto_Move(2, 2);
+            }
+            GoHome();
+        } else if (q[2] == c[1]) {
+            if (p[1] == 0) {
+                Auto_Catch(1, q[2]);
+            } else {
+                Auto_Catch(2, q[2]);
+            }
+            if (q[2] == p[1]) {
+                c1_p1();
+                Auto_put();
+                Auto_Move(4, 2);
+                Auto_Move(1, 1);
+            } else if (q[2] == p[2]) {
+                c1_p2();
+                Auto_put();
+                Auto_Move(4, 2);
+            } else if (q[2] == p[3]) {
+                c1_p3();
+                Auto_put();
+                Auto_Move(4, 2);
+                Auto_Move(2, 1);
+            }
+            Auto_Move(4, 2);
+            Catch_Ball();
+            if (q[3] == p[1]) {
+                c2_p1();
+            } else if (q[3] == p[2]) {
+                c2_p2();
+            } else if (q[3] == p[3]) {
+                c2_p3();
+            }
+            Auto_put();
+            Auto_Move(4, 2);
+            if (q[3] == p[1]) { ;
+            } else if (q[3] == p[2]) {
+                Auto_Move(2, 1);
+            } else if (q[3] == p[3]) {
+                Auto_Move(2, 2);
+            }
+            GoHome();
+        }
     }
 }
