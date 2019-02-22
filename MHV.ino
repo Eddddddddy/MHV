@@ -68,6 +68,9 @@
 #define Track_4 33
 #define Track_5 34
 #define Track_6 35
+#define Track_7 36
+#define Track_8 37
+#define Track_9 38
 //碰到黑线是1
 
 #define modeee 45
@@ -87,7 +90,7 @@ Servo Hand_Servo_4;
 
 //byte highByte = 0x00, lowByte = 0x00;
 int MotorSpeed_1 = 0, MotorSpeed_2 = 0, MotorSpeed_3 = 0, MotorSpeed_4 = 0;
-int xxx = 0, yyy = 0, aa, bb, val, val1, val2, val3, i = 0, j = 5, a0, a1, a2, a3, b0, b1, b2, b3, jj = 0, ii, b[4], c[4], u, ooooo;
+int val,  p[4], c[4],q[4];
 long int iiii;
 
 //double zzz;
@@ -151,7 +154,11 @@ void setup() {
     pinMode(Track_2, INPUT);
     pinMode(Track_3, INPUT);
     pinMode(Track_4, INPUT);
-
+    pinMode(Track_5,INPUT);
+    pinMode(Track_6,INPUT);
+    pinMode(Track_7,INPUT);
+    pinMode(Track_8,INPUT);
+    pinMode(Track_9,INPUT);
 
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
@@ -162,7 +169,7 @@ void setup() {
     Hand_Servo_3.write(INI_Servo_3);
     Hand_Servo_4.write(INI_Servo_4);
 
-
+    Serial.write("");//开启扫码模块
 }
 
 //loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop
@@ -511,7 +518,7 @@ int Cam_2_decode(){
 }
 
 void process() {
-    int c[4], q[4], p[4];
+    //int c[4], q[4], p[4];
     Auto_Catch(2, q[1]);
     if (q[1] == c[1]) {
         c1_p1();
@@ -791,4 +798,16 @@ void process() {
             GoHome();
         }
     }
+}
+
+int Rec_QR(){
+    int temp;
+    temp=Serial.read();
+    q[3]=temp%10;
+    q[2]=temp%100;
+    q[1]=temp%1000;
+}
+
+int Rec_Cam_1(){
+    .digitalRead();
 }
