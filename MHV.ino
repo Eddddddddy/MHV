@@ -5,10 +5,10 @@
 //#include<SoftwareSerial.h>
 //#include<JY901.h>//陀螺仪库
 #include "Servo.h"
-#include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/USBAPI.h"
+//#include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/USBAPI.h"
 //舵机库
 #include "U8glib.h"
-#include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/HardwareSerial.h"
+//#include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/HardwareSerial.h"
 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);  // I2C / TWI
 
@@ -134,7 +134,6 @@ void setup() {
     Hand_Servo_2.write(INI_Servo_2);
     Hand_Servo_3.write(INI_Servo_3);
     Hand_Servo_4.write(INI_Servo_4);
-
 }
 
 //loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop
@@ -142,14 +141,17 @@ void loop() {
     Auto_Move(1, 3, 3);
     Auto_Move(3, 2, 2);
     Auto_Move(2, 3, 4);
+    Serial.print("loop");
     Auto_Move(4, 2, 1);
+    Serial.print("end");
 
 }
 
-void Auto_Move(int order, int line, int track) {//order:1->前 2->后 3->左 4->右
+void Auto_Move(int order, int line, int track) {   //order:1->前 2->后 3->左 4->右
     int i = 1;
     if (order == 1) {
         while (1) {
+            Move_speed_adjust(140, 0, 80, 0);
             if (track == 3) {
                 if (digitalRead(Track_8)) {
                     delay(50);
@@ -174,7 +176,7 @@ void Auto_Move(int order, int line, int track) {//order:1->前 2->后 3->左 4->
             if (i > line) {
                 break;
             }
-            Move_speed_adjust(140, 0, 80, 0);
+
         }
     } else if (order == 2) {
         while (1) {
@@ -189,6 +191,7 @@ void Auto_Move(int order, int line, int track) {//order:1->前 2->后 3->左 4->
                     i++;
                 }
             } else if (track == 4) {
+                Move_speed_adjust(-140, 0, 80, 0);
                 if (digitalRead(Track_4)) {
                     delay(50);
                     while (1) {
@@ -202,10 +205,11 @@ void Auto_Move(int order, int line, int track) {//order:1->前 2->后 3->左 4->
             if (i > line) {
                 break;
             }
-            Move_speed_adjust(-140, 0, 80, 0);
+
         }
     } else if (order == 3) {
         while (1) {
+            Move_speed_adjust(0, 140, 0, 60);
             if (track == 1) {
                 if (digitalRead(Track_1)) {
                     delay(50);
@@ -234,6 +238,7 @@ void Auto_Move(int order, int line, int track) {//order:1->前 2->后 3->左 4->
         }
     } else if (order == 4) {
         while (1) {
+            Move_speed_adjust(0, -140, 0, 60);
             if (track == 1) {
                 if (digitalRead(Track_2)) {
                     delay(50);
@@ -274,7 +279,7 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
     State[5] = digitalRead(Track_6);
     State[6] = digitalRead(Track_7);
     State[7] = digitalRead(Track_8);
-    if (x_speed >= 0) {
+    if (x_speed > 0) {
         MotorSpeed_1 = x_speed;
         MotorSpeed_4 = -x_speed;
         MotorSpeed_2 = 0;
@@ -287,42 +292,42 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
             MotorSpeed_4 = -(x_speed + x_adjust);
             MotorSpeed_1 = x_speed - x_adjust;
         }
-    } else if (x_speed <= 0) {
+    } else if (x_speed < 0) {
         MotorSpeed_1 = x_speed;
         MotorSpeed_4 = -x_speed;
         MotorSpeed_2 = 0;
         MotorSpeed_3 = 0;
-        if (State[5] && !State[6]) {
+        if (State[4] && !State[5]) {
             MotorSpeed_4 = -(x_speed - x_adjust);
             MotorSpeed_1 = x_speed + x_adjust;
         }
-        if (!State[5] && State[6]) {
+        if (!State[4] && State[5]) {
             MotorSpeed_4 = -(x_speed + x_adjust);
             MotorSpeed_1 = x_speed - x_adjust;
         }
-    } else if (y_speed >= 0) {
+    } else if (y_speed > 0) {
         MotorSpeed_2 = -y_speed;
         MotorSpeed_3 = y_speed;
         MotorSpeed_1 = 0;
         MotorSpeed_4 = 0;
-        if (State[2] && !State[3]) {
+        if (!State[2] && State[3]) {
             MotorSpeed_2 = -(y_speed - y_adjust);
             MotorSpeed_3 = y_speed + y_adjust;
         }
-        if (!State[2] && State[3]) {
+        if (State[2] && !State[3]) {
             MotorSpeed_2 = -(y_speed + y_adjust);
             MotorSpeed_3 = y_speed - y_adjust;
         }
-    } else if (y_speed <= 0) {
+    } else if (y_speed < 0) {
         MotorSpeed_2 = -y_speed;
         MotorSpeed_3 = y_speed;
         MotorSpeed_1 = 0;
         MotorSpeed_4 = 0;
-        if (State[7] && !State[8]) {
+        if (!State[6] && State[7]) {
             MotorSpeed_2 = -(y_speed - y_adjust);
             MotorSpeed_3 = y_speed + y_adjust;
         }
-        if (!State[7] && State[8]) {
+        if (State[6] && !State[7]) {
             MotorSpeed_2 = -(y_speed + y_adjust);
             MotorSpeed_3 = y_speed - y_adjust;
         }
@@ -430,47 +435,47 @@ void stop() {
 }
 
 void c1_p1() {
-    Auto_Move(2, 1);
-    Auto_Move(3, 3);
+    Auto_Move(2, 1, 3);
+    Auto_Move(3, 3, 1);
 }
 
 void c1_p2() {
-    Auto_Move(1, 1);
-    Auto_Move(3, 3);
+    Auto_Move(1, 1, 3);
+    Auto_Move(3, 3, 1);
 }
 
 void c1_p3() {
-    Auto_Move(1, 2);
-    Auto_Move(3, 3);
+    Auto_Move(1, 2, 3);
+    Auto_Move(3, 3, 2);
 }
 
 void c2_p1() {
-    Auto_Move(2, 1);
-    Auto_Move(3, 3);
+    Auto_Move(2, 1, 3);
+    Auto_Move(3, 3, 1);
 }
 
 void c2_p2() {
-    Auto_Move(3, 3);
+    Auto_Move(3, 3, 1);
 }
 
 void c2_p3() {
-    Auto_Move(1, 1);
-    Auto_Move(3, 3);
+    Auto_Move(1, 1, 3);
+    Auto_Move(3, 3, 2);
 }
 
 void c3_p1() {
-    Auto_Move(2, 2);
-    Auto_Move(3, 3);
+    Auto_Move(2, 2, 3);
+    Auto_Move(3, 3, 1);
 }
 
 void c3_p2() {
-    Auto_Move(2, 1);
-    Auto_Move(3, 3);
+    Auto_Move(2, 1, 3);
+    Auto_Move(3, 3, 1);
 }
 
 void c3_p3() {
-    Auto_Move(1, 1);
-    Auto_Move(3, 3);
+    Auto_Move(1, 1, 3);
+    Auto_Move(3, 3, 2);
 }
 
 void Auto_put() {
@@ -577,8 +582,8 @@ int Cam_2_decode() {//在摄像头里写delay
 }
 
 void GoHome() {
-    Auto_Move(2, 2);
-    Auto_Move(4, 4);
+    Auto_Move(2, 2, 4);
+    Auto_Move(4, 4, 1);
     Move_noTrack(2, 1000);
     Move_noTrack(4, 1000);
     delay(10000000000);
@@ -594,23 +599,23 @@ void process() {
             Auto_put();
             p[1] = 0;
         }
-        Auto_Move(1, 1);
+        Auto_Move(1, 1, 4);
         p[2] = Cam_2_decode();
         p[3] = 6 - p[1] - p[2];
         if (q[1] == p[2]) {
             Auto_put();
             p[2] = 0;
-            Auto_Move(4, 4);
+            Auto_Move(4, 4, 1);
         } else if (q[1] == p[3]) {
-            Auto_Move(1, 1);
+            Auto_Move(1, 1, 4);
             Auto_put();
             p[3] = 0;
             if (q[2] == c[2]) {
-                Auto_Move(4, 2);
-                Auto_Move(2, 1);
-                Auto_Move(4, 2);
+                Auto_Move(4, 2, 2);
+                Auto_Move(2, 1, 4);
+                Auto_Move(4, 2, 2);
             } else if (q[2] == c[3]) {
-                Auto_Move(4, 4);
+                Auto_Move(4, 4, 2);
             }
         }
         if (q[2] == c[2]) {
@@ -623,7 +628,7 @@ void process() {
                 c2_p3();
             }
             Auto_put();
-            Auto_Move(4, 4);
+            Auto_Move(4, 4, 1);
             if (q[2] == p[3]) {
                 Auto_Catch(2, q[3]);
             } else {
@@ -637,12 +642,13 @@ void process() {
                 c3_p3();
             }
             Auto_put();
-            Auto_Move(4, 2);
-            if (q[3] == p[1]) { ;
+            Auto_Move(4, 2, 2);
+            if (q[3] == p[1]) {
+                ;
             } else if (q[3] == p[2]) {
-                Auto_Move(2, 1);
+                Auto_Move(2, 1, 4);
             } else if (q[3] == p[3]) {
-                Auto_Move(2, 2);
+                Auto_Move(2, 2, 4);
             }
             GoHome();
         } else if (q[2] == c[3]) {
@@ -654,19 +660,19 @@ void process() {
             if (q[2] == p[1]) {
                 c3_p1();
                 Auto_put();
-                Auto_Move(4, 2);
-                Auto_Move(1, 1);
+                Auto_Move(4, 2, 1);
+                Auto_Move(1, 1, 4);
             } else if (q[2] == p[2]) {
                 c3_p2();
                 Auto_put();
-                Auto_Move(4, 2);
+                Auto_Move(4, 2, 1);
             } else if (q[2] == p[3]) {
                 c3_p3();
                 Auto_put();
-                Auto_Move(4, 2);
-                Auto_Move(2, 1);
+                Auto_Move(4, 2, 2);
+                Auto_Move(2, 1, 4);
             }
-            Auto_Move(4, 2);
+            Auto_Move(4, 2, 1);
             Catch_Ball();
             if (q[3] == p[1]) {
                 c2_p1();
@@ -676,12 +682,13 @@ void process() {
                 c2_p3();
             }
             Auto_put();
-            Auto_Move(4, 2);
-            if (q[3] == p[1]) { ;
+            Auto_Move(4, 2, 2);
+            if (q[3] == p[1]) {
+                ;
             } else if (q[3] == p[2]) {
-                Auto_Move(2, 1);
+                Auto_Move(2, 1, 4);
             } else if (q[3] == p[3]) {
-                Auto_Move(2, 2);
+                Auto_Move(2, 2, 4);
             }
             GoHome();
         }
@@ -692,16 +699,16 @@ void process() {
             Auto_put();
             p[1] = 0;
         }
-        Auto_Move(1, 1);
+        Auto_Move(1, 1, 4);
         p[2] = Cam_2_decode();
         p[3] = 6 - p[1] - p[2];
         if (q[1] == p[2]) {
             Auto_put();
         } else if (q[1] == p[3]) {
-            Auto_Move(1, 1);
+            Auto_Move(1, 1, 4);
             Auto_put();
         }
-        Auto_Move(4, 4);
+        Auto_Move(4, 4, 2);
         Auto_Catch(2, q[2]);
         if (q[2] == c[1]) {
             if (q[2] == p[1]) {
@@ -712,7 +719,7 @@ void process() {
                 c1_p3();
             }
             Auto_put();
-            Auto_Move(4, 4);
+            Auto_Move(4, 4, 1);
             if (q[2] == p[3]) {
                 Auto_Catch(2, q[3]);
             } else {
@@ -726,12 +733,13 @@ void process() {
                 c3_p3();
             }
             Auto_put();
-            Auto_Move(4, 2);
-            if (q[3] == p[1]) { ;
+            Auto_Move(4, 2, 2);
+            if (q[3] == p[1]) {
+                ;
             } else if (q[3] == p[2]) {
-                Auto_Move(2, 1);
+                Auto_Move(2, 1, 4);
             } else if (q[3] == p[3]) {
-                Auto_Move(2, 2);
+                Auto_Move(2, 2, 4);
             }
             GoHome();
         } else if (q[2] == c[3]) {
@@ -743,7 +751,7 @@ void process() {
                 c3_p3();
             }
             Auto_put();
-            Auto_Move(4, 4);
+            Auto_Move(4, 4, 2);
             if (q[2] == p[1]) {
                 Auto_Catch(1, q[3]);
             } else {
@@ -757,12 +765,13 @@ void process() {
                 c1_p3();
             }
             Auto_put();
-            Auto_Move(4, 2);
-            if (q[3] == p[1]) { ;
+            Auto_Move(4, 2, 2);
+            if (q[3] == p[1]) {
+                ;
             } else if (q[3] == p[2]) {
-                Auto_Move(2, 1);
+                Auto_Move(2, 1, 4);
             } else if (q[3] == p[3]) {
-                Auto_Move(2, 2);
+                Auto_Move(2, 2, 4);
             }
             GoHome();
         }
@@ -773,23 +782,23 @@ void process() {
             Auto_put();
             p[3] = 0;
         }
-        Auto_Move(2, 1);
+        Auto_Move(2, 1, 4);
         p[2] = Cam_2_decode();
         p[1] = 6 - p[1] - p[2];
         if (q[1] == p[2]) {
             Auto_put();
             p[2] = 0;
-            Auto_Move(4, 4);
+            Auto_Move(4, 4, 2);
         } else if (q[1] == p[1]) {
-            Auto_Move(2, 1);
+            Auto_Move(2, 1, 4);
             Auto_put();
             p[1] = 0;
             if (q[2] == c[2]) {
-                Auto_Move(4, 2);
-                Auto_Move(1, 1);
-                Auto_Move(4, 2);
+                Auto_Move(4, 2, 1);
+                Auto_Move(1, 1, 4);
+                Auto_Move(4, 2, 2);
             } else if (q[2] == c[3]) {
-                Auto_Move(4, 4);
+                Auto_Move(4, 4, 2);
             }
         }
         if (q[2] == c[2]) {
@@ -802,7 +811,7 @@ void process() {
                 c2_p3();
             }
             Auto_put();
-            Auto_Move(4, 4);
+            Auto_Move(4, 4, 2);
             if (q[2] == p[3]) {
                 Auto_Catch(2, q[3]);
             } else {
@@ -816,12 +825,13 @@ void process() {
                 c1_p3();
             }
             Auto_put();
-            Auto_Move(4, 2);
-            if (q[3] == p[1]) { ;
+            Auto_Move(4, 2, 2);
+            if (q[3] == p[1]) {
+                ;
             } else if (q[3] == p[2]) {
-                Auto_Move(2, 1);
+                Auto_Move(2, 1, 4);
             } else if (q[3] == p[3]) {
-                Auto_Move(2, 2);
+                Auto_Move(2, 2, 4);
             }
             GoHome();
         } else if (q[2] == c[1]) {
@@ -833,19 +843,19 @@ void process() {
             if (q[2] == p[1]) {
                 c1_p1();
                 Auto_put();
-                Auto_Move(4, 2);
-                Auto_Move(1, 1);
+                Auto_Move(4, 2, 1);
+                Auto_Move(1, 1, 4);
             } else if (q[2] == p[2]) {
                 c1_p2();
                 Auto_put();
-                Auto_Move(4, 2);
+                Auto_Move(4, 2, 2);
             } else if (q[2] == p[3]) {
                 c1_p3();
                 Auto_put();
-                Auto_Move(4, 2);
-                Auto_Move(2, 1);
+                Auto_Move(4, 2, 2);
+                Auto_Move(2, 1, 4);
             }
-            Auto_Move(4, 2);
+            Auto_Move(4, 2, 2);
             Catch_Ball();
             if (q[3] == p[1]) {
                 c2_p1();
@@ -855,12 +865,13 @@ void process() {
                 c2_p3();
             }
             Auto_put();
-            Auto_Move(4, 2);
-            if (q[3] == p[1]) { ;
+            Auto_Move(4, 2, 2);
+            if (q[3] == p[1]) {
+                ;
             } else if (q[3] == p[2]) {
-                Auto_Move(2, 1);
+                Auto_Move(2, 1, 4);
             } else if (q[3] == p[3]) {
-                Auto_Move(2, 2);
+                Auto_Move(2, 2, 4);
             }
             GoHome();
         }
@@ -901,8 +912,8 @@ int Cam_1_decode() {
 
 void Begin() {
     Move_noTrack(1, 1000);
-    Auto_Move(3, 2);
-    Auto_Move(1, 4);
+    Auto_Move(3, 2, 1);
+    Auto_Move(1, 4, 3);
     Cam_1_decode();
 
     Rec_QR();
