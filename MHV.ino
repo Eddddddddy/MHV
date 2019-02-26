@@ -7,8 +7,10 @@
 #include "Servo.h"
 #include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/USBAPI.h"
 //舵机库
-//#include "U8glib.h"
-//U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);
+#include "U8glib.h"
+#include "../../../../Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/HardwareSerial.h"
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);  // I2C / TWI
 
 #define Motor_PWM_1 2
 #define Motor_PWM_2 3
@@ -88,6 +90,8 @@ void setup() {
     while (Serial2.read() >= 0) {}
     while (Serial3.read() >= 0) {}
 
+    INI_QR();
+
     //MsTimer2::set(1, flash);
 
     pinMode(Motor_PWM_1, OUTPUT); //定义电机针脚
@@ -103,29 +107,6 @@ void setup() {
     pinMode(Motor_A4, OUTPUT);
     pinMode(Motor_B4, OUTPUT);
 
-//    pinMode(Cam_1L, INPUT);
-//    pinMode(Cam_1R, INPUT);
-//    pinMode(Cam_2L, INPUT);
-//    pinMode(Cam_2R, INPUT);
-//    pinMode(Cam_3L, INPUT);
-//    pinMode(Cam_3R, INPUT);
-//    pinMode(Cam_4L, INPUT);
-//    pinMode(Cam_4R, INPUT);
-//    //movexyz(0, 0, 0);
-//
-//    pinMode(ca1, OUTPUT);
-//    pinMode(ca2, OUTPUT);
-//    pinMode(ca3, OUTPUT);
-//
-//    pinMode(ca4, INPUT);
-//    pinMode(ca5, INPUT);
-//    pinMode(ca6, INPUT);
-//    pinMode(ca7, INPUT);
-//    pinMode(ca8, INPUT);
-//    pinMode(ca9, INPUT);
-
-    //pinMode(ca10, OUTPUT);
-
     pinMode(Track_1, INPUT);
     pinMode(Track_2, INPUT);
     pinMode(Track_3, INPUT);
@@ -136,6 +117,15 @@ void setup() {
     pinMode(Track_8, INPUT);
     pinMode(Track_9, INPUT);
 
+    pinMode(Cam_1_Write_1, OUTPUT);
+    pinMode(Cam_1_Write_2, OUTPUT);
+    pinMode(Cam_1_Read_1, INPUT);
+    pinMode(Cam_1_Read_2, INPUT);
+    pinMode(Cam_1_Read_3, INPUT);
+    pinMode(Cam_2_Write_1, OUTPUT);
+    pinMode(Cam_2_Read_1, INPUT);
+    pinMode(Cam_2_Read_2, INPUT);
+
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
     Hand_Servo_3.attach(Servo_3);
@@ -145,27 +135,41 @@ void setup() {
     Hand_Servo_3.write(INI_Servo_3);
     Hand_Servo_4.write(INI_Servo_4);
 
-    Serial.write("");//开启扫码模块
 }
 
 //loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop
 void loop() {
-    Auto_Move(4, 40);
-    delay(10000000);
+    Auto_Move(1, 3, 3);
+    Auto_Move(3, 2, 2);
+    Auto_Move(2, 3, 4);
+    Auto_Move(4, 2, 1);
+
 }
 
-void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
+void Auto_Move(int order, int line, int track) {//order:1->前 2->后 3->左 4->右
     int i = 1;
     if (order == 1) {
         while (1) {
-            if (digitalRead(Track_3)) {
-                delay(50);
-                while (1) {
-                    if (digitalRead(Track_3) == 0) {
-                        break;
+            if (track == 3) {
+                if (digitalRead(Track_8)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_8) == 0) {
+                            break;
+                        }
                     }
+                    i++;
                 }
-                i++;
+            } else if (track == 4) {
+                if (digitalRead(Track_3)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_3) == 0) {
+                            break;
+                        }
+                    }
+                    i++;
+                }
             }
             if (i > line) {
                 break;
@@ -174,14 +178,26 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
         }
     } else if (order == 2) {
         while (1) {
-            if (digitalRead(Track_4)) {
-                delay(50);
-                while (1) {
-                    if (digitalRead(Track_4) == 0) {
-                        break;
+            if (track == 3) {
+                if (digitalRead(Track_7)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_7) == 0) {
+                            break;
+                        }
                     }
+                    i++;
                 }
-                i++;
+            } else if (track == 4) {
+                if (digitalRead(Track_4)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_4) == 0) {
+                            break;
+                        }
+                    }
+                    i++;
+                }
             }
             if (i > line) {
                 break;
@@ -190,14 +206,26 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
         }
     } else if (order == 3) {
         while (1) {
-            if (digitalRead(Track_1)) {
-                delay(50);
-                while (1) {
-                    if (digitalRead(Track_1) == 0) {
-                        break;
+            if (track == 1) {
+                if (digitalRead(Track_1)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_1) == 0) {
+                            break;
+                        }
                     }
+                    i++;
                 }
-                i++;
+            } else if (track == 2) {
+                if (digitalRead(Track_6)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_6) == 0) {
+                            break;
+                        }
+                    }
+                    i++;
+                }
             }
             if (i > line) {
                 break;
@@ -206,14 +234,26 @@ void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
         }
     } else if (order == 4) {
         while (1) {
-            if (digitalRead(Track_2)) {
-                delay(50);
-                while (1) {
-                    if (digitalRead(Track_2) == 0) {
-                        break;
+            if (track == 1) {
+                if (digitalRead(Track_2)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_2) == 0) {
+                            break;
+                        }
                     }
+                    i++;
                 }
-                i++;
+            } else if (track == 2) {
+                if (digitalRead(Track_5)) {
+                    delay(50);
+                    while (1) {
+                        if (digitalRead(Track_5) == 0) {
+                            break;
+                        }
+                    }
+                    i++;
+                }
             }
             if (i > line) {
                 break;
@@ -234,7 +274,7 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
     State[5] = digitalRead(Track_6);
     State[6] = digitalRead(Track_7);
     State[7] = digitalRead(Track_8);
-    if (x_speed != 0) {
+    if (x_speed >= 0) {
         MotorSpeed_1 = x_speed;
         MotorSpeed_4 = -x_speed;
         MotorSpeed_2 = 0;
@@ -247,7 +287,20 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
             MotorSpeed_4 = -(x_speed + x_adjust);
             MotorSpeed_1 = x_speed - x_adjust;
         }
-    } else if (y_speed != 0) {
+    } else if (x_speed <= 0) {
+        MotorSpeed_1 = x_speed;
+        MotorSpeed_4 = -x_speed;
+        MotorSpeed_2 = 0;
+        MotorSpeed_3 = 0;
+        if (State[5] && !State[6]) {
+            MotorSpeed_4 = -(x_speed - x_adjust);
+            MotorSpeed_1 = x_speed + x_adjust;
+        }
+        if (!State[5] && State[6]) {
+            MotorSpeed_4 = -(x_speed + x_adjust);
+            MotorSpeed_1 = x_speed - x_adjust;
+        }
+    } else if (y_speed >= 0) {
         MotorSpeed_2 = -y_speed;
         MotorSpeed_3 = y_speed;
         MotorSpeed_1 = 0;
@@ -255,19 +308,27 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
         if (State[2] && !State[3]) {
             MotorSpeed_2 = -(y_speed - y_adjust);
             MotorSpeed_3 = y_speed + y_adjust;
-            //MotorSpeed_4 = -y_adjust;
-
         }
         if (!State[2] && State[3]) {
             MotorSpeed_2 = -(y_speed + y_adjust);
             MotorSpeed_3 = y_speed - y_adjust;
-            //MotorSpeed_4 = y_adjust;
+        }
+    } else if (y_speed <= 0) {
+        MotorSpeed_2 = -y_speed;
+        MotorSpeed_3 = y_speed;
+        MotorSpeed_1 = 0;
+        MotorSpeed_4 = 0;
+        if (State[7] && !State[8]) {
+            MotorSpeed_2 = -(y_speed - y_adjust);
+            MotorSpeed_3 = y_speed + y_adjust;
+        }
+        if (!State[7] && State[8]) {
+            MotorSpeed_2 = -(y_speed + y_adjust);
+            MotorSpeed_3 = y_speed - y_adjust;
         }
     }
 
-
     Move_4_speed(MotorSpeed_1, MotorSpeed_2, MotorSpeed_3, MotorSpeed_4);
-
 }
 
 void Move_4_speed(int Speed_1, int Speed_2, int Speed_3, int Speed_4) {
@@ -415,6 +476,29 @@ void c3_p3() {
 void Auto_put() {
     Move_noTrack(3, 300);
     Put_Ball_a();
+    Put_Ball_b();
+}
+
+void Put_Ball_a() {
+    Hand_Servo_1.write(90);
+    Hand_Servo_2.write(120);
+    Hand_Servo_3.write(0);
+    Hand_Servo_4.write(60);
+    delay(1000);
+    Hand_Servo_1.write(179);
+    delay(2000);
+    Hand_Servo_2.write(0);
+    delay(1000);
+    Hand_Servo_4.write(20);
+    delay(1000);
+}
+
+void Put_Ball_b() {
+    Hand_Servo_2.write(120);
+    delay(1000);
+    Hand_Servo_1.write(90);
+    delay(1000);
+    Hand_Servo_2.write(90);
 }
 
 void Auto_Catch(int dir, int color) {//dir为l为左，r为右
@@ -492,11 +576,11 @@ int Cam_2_decode() {//在摄像头里写delay
     }
 }
 
-void GoHome(){
-    Auto_Move(2,2);
-    Auto_Move(4,4);
-    Move_noTrack(2,1000);
-    Move_noTrack(4,1000);
+void GoHome() {
+    Auto_Move(2, 2);
+    Auto_Move(4, 4);
+    Move_noTrack(2, 1000);
+    Move_noTrack(4, 1000);
     delay(10000000000);
 }
 
@@ -785,30 +869,50 @@ void process() {
 
 void Rec_QR() {
     int temp;
-    temp = Serial.read();
+    temp = (int) Serial3.read();
     q[3] = temp % 10;
-    q[2] = temp % 100/10;
-    q[1] = temp % 1000/100;
+    q[2] = temp % 100 / 10;
+    q[1] = temp % 1000 / 100;
+    Print_QR((String) temp);
+}
+
+void Print_QR(String printStr) {
+    u8g.firstPage();
+    do {
+        u8g.setFont(u8g_font_ncenB14);
+        u8g.setPrintPos(0, 20);
+        u8g.print(printStr);
+    } while (u8g.nextPage());
 }
 
 int Cam_1_decode() {
-        int a[3];
-        a[0] = digitalRead(Cam_1_Read_1);
-        a[1] = digitalRead(Cam_1_Read_2);
-        a[2] = digitalRead(Cam_1_Read_3);
-        if(!a[0]&&!a[1]&&a[2])return 123;
-        else if(!a[0]&&a[1]&&!a[2])return 132;
-        else if(!a[0]&&a[1]&&a[2])return 213;
-        else if(a[0]&&!a[1]&&!a[2])return 231;
-        else if(a[0]&&!a[1]&&a[2])return 312;
-        else if(a[0]&&a[1]&&!a[2])return 321;
-        return 123;
+    int a[3];
+    a[0] = digitalRead(Cam_1_Read_1);
+    a[1] = digitalRead(Cam_1_Read_2);
+    a[2] = digitalRead(Cam_1_Read_3);
+    if (!a[0] && !a[1] && a[2])return 123;
+    else if (!a[0] && a[1] && !a[2])return 132;
+    else if (!a[0] && a[1] && a[2])return 213;
+    else if (a[0] && !a[1] && !a[2])return 231;
+    else if (a[0] && !a[1] && a[2])return 312;
+    else if (a[0] && a[1] && !a[2])return 321;
+    return 123;
 }
 
-void Begin(){
-    Move_noTrack(1,1000);
-    Auto_Move(3,2);
-    Auto_Move(1,4);
+void Begin() {
+    Move_noTrack(1, 1000);
+    Auto_Move(3, 2);
+    Auto_Move(1, 4);
     Cam_1_decode();
+
     Rec_QR();
+}
+
+void INI_QR() {
+    unsigned char hexData[9] = {0x7E, 0x00, 0x08, 0x01, 0x00, 0x02, 0x01, 0xAB, 0xCD};
+    Serial1.write(hexData, 9);
+    delay(50);
+    while (Serial3.available()) {
+        Serial3.read();
+    }
 }
