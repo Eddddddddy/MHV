@@ -10,8 +10,6 @@
 //#include "U8glib.h"
 //U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);
 
-#define MecMIX(X, Y, Z) (x*X+y*Y+z*Z)
-
 #define Motor_PWM_1 2
 #define Motor_PWM_2 3
 #define Motor_PWM_3 4
@@ -26,14 +24,14 @@
 #define Motor_B4 29
 #define speed1 100
 
-#define Cam_1L 50
-#define Cam_1R 51
-#define Cam_2L 52
-#define Cam_2R 53
-#define Cam_3L 46
-#define Cam_3R 47
-#define Cam_4L 48
-#define Cam_4R 49
+#define Cam_1_Write_1 40
+#define Cam_1_Write_2 41
+#define Cam_1_Read_1 42
+#define Cam_1_Read_2 43
+#define Cam_1_Read_3 44
+#define Cam_2_Write_1 45
+#define Cam_2_Read_1 46
+#define Cam_2_Read_2 47
 
 #define Servo_1 6
 #define Servo_2 7
@@ -49,18 +47,6 @@
 #define INI_Servo_3 0
 #define INI_Servo_4 20
 
-//#define ca1 34
-//#define ca2 35
-//#define ca3 36
-//
-//#define ca4 37
-#define ca5 38
-#define ca6 39
-#define ca7 40
-#define ca8 41
-#define ca9 42
-
-#define ca10 43
 
 #define Track_1 30
 #define Track_2 31
@@ -73,13 +59,6 @@
 #define Track_9 38
 //碰到黑线是1
 
-#define modeee 45
-#define tracb 44
-
-//#define ks1031 0xe8>>1
-//#define ks1032 0xe8>>1//需更改地址
-//#define Reg 0x02
-//#define NC 0x72
 
 Servo Hand_Servo_1;
 Servo Hand_Servo_2;
@@ -90,15 +69,12 @@ Servo Hand_Servo_4;
 
 //byte highByte = 0x00, lowByte = 0x00;
 int MotorSpeed_1 = 0, MotorSpeed_2 = 0, MotorSpeed_3 = 0, MotorSpeed_4 = 0;
-int val,  p[4], c[4],q[4];
+int val, p[4], c[4], q[4];
 long int iiii;
 
 //double zzz;
 
 
-void goto_put();
-
-void Move_noTrack(int dir, int time);
 
 void setup() {
     Serial.begin(9600);
@@ -154,11 +130,11 @@ void setup() {
     pinMode(Track_2, INPUT);
     pinMode(Track_3, INPUT);
     pinMode(Track_4, INPUT);
-    pinMode(Track_5,INPUT);
-    pinMode(Track_6,INPUT);
-    pinMode(Track_7,INPUT);
-    pinMode(Track_8,INPUT);
-    pinMode(Track_9,INPUT);
+    pinMode(Track_5, INPUT);
+    pinMode(Track_6, INPUT);
+    pinMode(Track_7, INPUT);
+    pinMode(Track_8, INPUT);
+    pinMode(Track_9, INPUT);
 
     Hand_Servo_1.attach(Servo_1);
     Hand_Servo_2.attach(Servo_2);
@@ -179,7 +155,7 @@ void loop() {
 }
 
 void Auto_Move(int order, int line) {//order:1->前 2->后 3->左 4->右
-    i = 1;
+    int i = 1;
     if (order == 1) {
         while (1) {
             if (digitalRead(Track_3)) {
@@ -254,11 +230,10 @@ void Move_speed_adjust(int x_speed, int y_speed, int x_adjust, int y_adjust) {
     State[1] = digitalRead(Track_2);
     State[2] = digitalRead(Track_3);
     State[3] = digitalRead(Track_4);
-    State[4] = digitalRead(Cam_3L);
-    State[5] = digitalRead(Cam_3R);
-    State[6] = digitalRead(Cam_4L);
-    State[7] = digitalRead(Cam_4R);
-
+    State[4] = digitalRead(Track_5);
+    State[5] = digitalRead(Track_6);
+    State[6] = digitalRead(Track_7);
+    State[7] = digitalRead(Track_8);
     if (x_speed != 0) {
         MotorSpeed_1 = x_speed;
         MotorSpeed_4 = -x_speed;
@@ -502,19 +477,27 @@ void Catch_Ball() {
     delay(2000);
 }
 
-int Cam_2_decode(){
+int Cam_2_decode() {//在摄像头里写delay
     int a[2];
-    a[0]=digitalRead(Cam_2_Read_1);
-    a[1]=digitalRead(Cam_2_Read_2);
-    if(!a[0]&&a[1]){
+    a[0] = digitalRead(Cam_2_Read_1);
+    a[1] = digitalRead(Cam_2_Read_2);
+    if (!a[0] && a[1]) {
         return 1;
-    }else if(a[0]&&!a[1]){
+    } else if (a[0] && !a[1]) {
         return 2;
-    }else if(a[0]&&a[1]){
+    } else if (a[0] && a[1]) {
         return 3;
-    }else{
+    } else {
         return 0;
     }
+}
+
+void GoHome(){
+    Auto_Move(2,2);
+    Auto_Move(4,4);
+    Move_noTrack(2,1000);
+    Move_noTrack(4,1000);
+    delay(10000000000);
 }
 
 void process() {
@@ -800,14 +783,32 @@ void process() {
     }
 }
 
-int Rec_QR(){
+void Rec_QR() {
     int temp;
-    temp=Serial.read();
-    q[3]=temp%10;
-    q[2]=temp%100;
-    q[1]=temp%1000;
+    temp = Serial.read();
+    q[3] = temp % 10;
+    q[2] = temp % 100/10;
+    q[1] = temp % 1000/100;
 }
 
-int Rec_Cam_1(){
-    .digitalRead();
+int Cam_1_decode() {
+        int a[3];
+        a[0] = digitalRead(Cam_1_Read_1);
+        a[1] = digitalRead(Cam_1_Read_2);
+        a[2] = digitalRead(Cam_1_Read_3);
+        if(!a[0]&&!a[1]&&a[2])return 123;
+        else if(!a[0]&&a[1]&&!a[2])return 132;
+        else if(!a[0]&&a[1]&&a[2])return 213;
+        else if(a[0]&&!a[1]&&!a[2])return 231;
+        else if(a[0]&&!a[1]&&a[2])return 312;
+        else if(a[0]&&a[1]&&!a[2])return 321;
+        return 123;
+}
+
+void Begin(){
+    Move_noTrack(1,1000);
+    Auto_Move(3,2);
+    Auto_Move(1,4);
+    Cam_1_decode();
+    Rec_QR();
 }
